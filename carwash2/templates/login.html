@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход — AutoDetail Pro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,600;14..32,900&display=swap" rel="stylesheet">
+  <style>
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .card-login{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:var(--radius-lg);padding:48px 40px;width:100%;max-width:420px;box-shadow:var(--shadow-lg)}
+    .logo{font-size:3.5rem;display:block;text-align:center;margin-bottom:6px;animation:float 3s ease-in-out infinite}
+    .login-title{text-align:center;font-size:1.9rem;font-weight:900;color:#fff;margin-bottom:4px}
+    .login-sub{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
+    .hint{background:rgba(245,158,11,.07);border:1px solid var(--border-gold);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:22px;font-size:.83rem}
+    .hint strong{color:var(--gold-primary)}
+    .hint p{margin:2px 0;color:var(--text-secondary)}
+    .form-label{color:var(--text-secondary)!important;font-size:.85rem;font-weight:600}
+    .divider{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-medium)}
+    .divider span{color:var(--text-muted);font-size:.8rem;white-space:nowrap}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card-login">
+    <span class="logo">🚗</span>
+    <div class="login-title">AutoDetail Pro</div>
+    <div class="login-sub">Система управления автомойкой</div>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}{% for cat,msg in msgs %}
+        <div class="alert alert-{{ cat }} mb-3">
+          {% if cat=='danger' %}❌{% elif cat=='success' %}✅{% else %}ℹ️{% endif %} {{ msg }}
+        </div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="hint">
+      <strong>Аккаунты по умолчанию:</strong>
+      <p>👑 Админ: <strong>admin</strong> / <strong>admin123</strong></p>
+      <p>🔧 Оператор: <strong>operator</strong> / <strong>oper1234</strong></p>
+      <p>🙋 Клиент: <strong>client</strong> / <strong>client12</strong></p>
+    </div>
+
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label">Логин</label>
+        <input type="text" name="username" class="form-control" placeholder="Введите логин" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Пароль</label>
+        <input type="password" name="password" class="form-control" placeholder="Введите пароль" required>
+      </div>
+      <button type="submit" class="btn btn-primary w-100 py-3 fw-bold">🔐 Войти</button>
+    </form>
+
+    <div class="divider"><span>нет аккаунта?</span></div>
+    <a href="{{ url_for('register') }}" class="btn btn-outline-warning w-100 fw-bold">📝 Зарегистрироваться</a>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

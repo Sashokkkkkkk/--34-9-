@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Регистрация — AutoDetail Pro</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,700;14..32,900&display=swap" rel="stylesheet">
+  <style>
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center}
+    .card-reg{background:var(--bg-card);border:1px solid var(--border-gold);border-radius:var(--radius-lg);padding:44px 40px;width:100%;max-width:460px;box-shadow:var(--shadow-lg)}
+    .logo{font-size:3rem;display:block;text-align:center;margin-bottom:6px;animation:float 3s ease-in-out infinite}
+    .reg-title{text-align:center;font-size:1.8rem;font-weight:900;color:#fff;margin-bottom:4px}
+    .reg-sub{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:24px}
+    .info-box{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.25);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;font-size:.83rem;color:#93c5fd}
+    .form-label{color:var(--text-secondary)!important;font-size:.85rem;font-weight:600}
+    .strength-bar{height:4px;border-radius:4px;margin-top:6px;transition:all .3s;background:transparent}
+    .s1{width:33%;background:#ef4444} .s2{width:66%;background:#f59e0b} .s3{width:100%;background:#10b981}
+    .divider{display:flex;align-items:center;gap:12px;margin:18px 0}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border-medium)}
+    .divider span{color:var(--text-muted);font-size:.8rem}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card-reg">
+    <span class="logo">📝</span>
+    <div class="reg-title">Регистрация</div>
+    <div class="reg-sub">Создайте аккаунт клиента</div>
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}{% for cat,msg in msgs %}
+        <div class="alert alert-{{ cat }} mb-3">
+          {% if cat=='danger' %}❌{% elif cat=='success' %}✅{% else %}ℹ️{% endif %} {{ msg }}
+        </div>
+      {% endfor %}{% endif %}
+    {% endwith %}
+
+    <div class="info-box">
+      🙋 После регистрации вы получите доступ к <strong>личному кабинету клиента</strong>: выбор услуг, бронирование, история заказов.
+    </div>
+
+    <form method="post">
+      <div class="mb-3">
+        <label class="form-label">Логин *</label>
+        <input type="text" name="username" class="form-control"
+               value="{{ form.get('username','') }}" placeholder="минимум 3 символа" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Ваше имя / ФИО *</label>
+        <input type="text" name="name" class="form-control"
+               value="{{ form.get('name','') }}" placeholder="Иванов Иван" required>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Телефон <span style="color:#64748b">(необязательно)</span></label>
+        <input type="text" name="phone" class="form-control"
+               value="{{ form.get('phone','') }}" placeholder="+79001234567">
+        <small style="color:#64748b">Нужен для связи с вами по заказам</small>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Пароль * <small style="color:#64748b">(минимум 4 символа)</small></label>
+        <input type="password" id="p1" name="password" class="form-control" required>
+        <div class="strength-bar" id="sbar"></div>
+        <div id="slbl" style="font-size:.75rem;margin-top:4px;color:#64748b"></div>
+      </div>
+      <div class="mb-4">
+        <label class="form-label">Повторите пароль *</label>
+        <input type="password" id="p2" name="password2" class="form-control" required>
+        <div id="mmsg" style="font-size:.78rem;margin-top:4px"></div>
+      </div>
+      <button type="submit" id="sbtn" class="btn btn-success w-100 py-3 fw-bold">✅ Зарегистрироваться</button>
+    </form>
+
+    <div class="divider"><span>уже есть аккаунт?</span></div>
+    <a href="{{ url_for('login') }}" class="btn btn-secondary w-100 fw-bold">🔐 Войти</a>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const p1=document.getElementById('p1'),p2=document.getElementById('p2'),
+      sb=document.getElementById('sbar'),sl=document.getElementById('slbl'),
+      mm=document.getElementById('mmsg'),btn=document.getElementById('sbtn');
+p1.addEventListener('input',()=>{
+  const v=p1.value,s=+(v.length>=4)+(+(v.length>=8))+(+/[A-Z0-9!@#]/.test(v));
+  sb.className='strength-bar '+(s?'s'+s:'');
+  sl.textContent=['','Слабый','Средний','Надёжный'][s];
+  sl.style.color=['','#ef4444','#f59e0b','#10b981'][s];
+  chk();
+});
+p2.addEventListener('input',chk);
+function chk(){
+  if(!p2.value){mm.textContent='';return}
+  if(p1.value===p2.value){mm.textContent='✅ Пароли совпадают';mm.style.color='#10b981';btn.disabled=false}
+  else{mm.textContent='❌ Пароли не совпадают';mm.style.color='#ef4444';btn.disabled=true}
+}
+</script>
+</body>
+</html>

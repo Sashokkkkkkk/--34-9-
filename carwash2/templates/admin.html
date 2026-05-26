@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}Панель администратора{% endblock %}
+{% block content %}
+<h2>⚙️ Панель администратора</h2>
+
+<div class="row g-4 mb-4">
+  <div class="col-md-4">
+    <div class="card p-4 text-center">
+      <div class="stat-icon">💰</div><h5>Общая выручка</h5>
+      <p class="display-5 fw-bold text-success mb-0">{{ "%.0f"|format(total_revenue) }} ₽</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-4 text-center">
+      <div class="stat-icon">✅</div><h5>Оплачено</h5>
+      <p class="display-5 fw-bold mb-0" style="color:#4ade80">{{ "%.0f"|format(total_paid) }} ₽</p>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card p-4 text-center">
+      <div class="stat-icon">⏳</div><h5>Задолженность</h5>
+      <p class="display-5 fw-bold mb-0" style="color:#f87171">{{ "%.0f"|format(total_revenue - total_paid) }} ₽</p>
+    </div>
+  </div>
+</div>
+
+<!-- Пользователи -->
+<div class="card p-4 mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">👥 Пользователи системы</h4>
+    <a href="{{ url_for('register') }}" class="btn btn-primary btn-sm">➕ Добавить</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead><tr><th>ID</th><th>Логин</th><th>Имя</th><th>Роль</th><th>Дата регистрации</th><th>Действия</th></tr></thead>
+      <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td><strong>{{ u.логин }}</strong>
+          {% if u.логин == cu_login %}<span class="badge" style="background:#1e3a5f;color:#7dd3fc;font-size:.7rem">вы</span>{% endif %}
+        </td>
+        <td>{{ u.имя }}</td>
+        <td>
+          {% if u.роль=='admin' %}<span class="badge" style="background:linear-gradient(135deg,#f59e0b,#d97706);color:#000">👑 Администратор</span>
+          {% elif u.роль=='operator' %}<span class="badge" style="background:#7c3aed">🔧 Оператор</span>
+          {% else %}<span class="badge" style="background:#0f766e">🙋 Клиент</span>{% endif %}
+        </td>
+        <td>{{ u.дата_рег[:10] }}</td>
+        <td>
+          {% if u.логин != cu_login %}
+            <div class="dropdown d-inline">
+              <button class="btn btn-sm btn-warning dropdown-toggle" data-bs-toggle="dropdown">Роль</button>
+              <ul class="dropdown-menu dropdown-menu-dark">
+                <li><a class="dropdown-item" href="{{ url_for('user_setrole', uid=u.id, role='admin') }}"
+                   onclick="return confirm('Сделать {{ u.логин }} администратором?')">👑 Администратор</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('user_setrole', uid=u.id, role='operator') }}"
+                   onclick="return confirm('Сделать {{ u.логин }} оператором?')">🔧 Оператор</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('user_setrole', uid=u.id, role='client') }}"
+                   onclick="return confirm('Понизить {{ u.логин }} до клиента?')">🙋 Клиент</a></li>
+              </ul>
+            </div>
+            <a href="{{ url_for('user_delete', uid=u.id) }}" class="btn btn-sm btn-danger"
+               onclick="return confirm('Удалить пользователя {{ u.логин }}?')">🗑️</a>
+          {% else %}
+            <span style="color:#64748b;font-size:.85rem">— текущий аккаунт —</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Все заказы -->
+<div class="card p-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">📋 Все заказы</h4>
+    <a href="{{ url_for('order_new') }}" class="btn btn-primary btn-sm">➕ Новый заказ</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead><tr><th>№</th><th>Клиент</th><th>Авто</th><th>Статус</th><th>Итого</th><th>Оплачено</th><th>Дата</th><th>Действия</th></tr></thead>
+      <tbody>
+      {% for o in orders %}
+      <tr>
+        <td>{{ o.id }}</td><td>{{ o.фио }}</td><td>{{ o.авто }}</td>
+        <td>{% set sc={'Готов':'10b981','В работе':'f59e0b','Новый':'3b82f6'}.get(o.статус,'64748b') %}
+          <span class="badge" style="background:#{{ sc }};{% if o.статус=='В работе' %}color:#000{% endif %}">{{ o.статус }}</span></td>
+        <td><strong>{{ "%.0f"|format(o.итого) }}</strong> ₽</td>
+        <td>{{ "%.0f"|format(o.оплачено) }} ₽</td>
+        <td>{{ o.дата_создания[:10] }}</td>
+        <td>
+          <a href="{{ url_for('order_detail', id=o.id) }}" class="btn btn-sm btn-info">🔍</a>
+          <a href="{{ url_for('order_edit', id=o.id) }}" class="btn btn-sm btn-warning">✏️</a>
+          <a href="{{ url_for('order_delete', id=o.id) }}" class="btn btn-sm btn-danger"
+             onclick="return confirm('Удалить заказ №{{ o.id }}?')">🗑️</a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

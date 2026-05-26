@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Автомобили{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🏎️ Автомобили</h2>
+    <a href="{{ url_for('vehicle_new') }}" class="btn btn-primary">➕ Добавить автомобиль</a>
+</div>
+<div class="card p-0">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>ID</th><th>Владелец</th><th>Марка</th><th>Модель</th><th>Госномер</th><th>Цвет</th><th>Действия</th></tr>
+            </thead>
+            <tbody>
+            {% for v in vehicles %}
+            <tr>
+                <td>{{ v.id }}</td>
+                <td>{{ v.владелец }}</td>
+                <td>{{ v.марка }}</td>
+                <td>{{ v.модель or '—' }}</td>
+                <td><strong>{{ v.госномер }}</strong></td>
+                <td>{{ v.цвет or '—' }}</td>
+                <td>
+                    <a href="{{ url_for('vehicle_edit', id=v.id) }}" class="btn btn-sm btn-warning">✏️</a>
+                    {% if is_admin() %}
+                    <a href="{{ url_for('vehicle_delete', id=v.id) }}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Удалить автомобиль {{ v.госномер }}?')">🗑️</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not vehicles %}
+            <tr><td colspan="7" class="text-center py-4">Автомобили не найдены</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

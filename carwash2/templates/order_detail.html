@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Заказ №{{ order.id }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📄 Заказ №{{ order.id }}</h2>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('order_edit', id=order.id) }}" class="btn btn-warning">✏️ Редактировать</a>
+        {% if is_admin() %}
+        <a href="{{ url_for('order_delete', id=order.id) }}" class="btn btn-danger"
+           onclick="return confirm('Удалить заказ №{{ order.id }}?')">🗑️ Удалить</a>
+        {% endif %}
+        <a href="{{ url_for('orders') }}" class="btn btn-secondary">← Назад</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h4>👤 Клиент и авто</h4>
+            <table class="table table-sm mb-0">
+                <tr><th>Клиент</th><td>{{ order.клиент_фио }}</td></tr>
+                <tr><th>Автомобиль</th><td>{{ order.марка }} {{ order.модель }}</td></tr>
+                <tr><th>Госномер</th><td><strong>{{ order.госномер }}</strong></td></tr>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h4>📋 Статус и оплата</h4>
+            <table class="table table-sm mb-0">
+                <tr><th>Статус</th><td>
+                    {% if order.статус == 'Готов' %}<span class="badge" style="background:#10b981">{{ order.статус }}</span>
+                    {% elif order.статус == 'В работе' %}<span class="badge" style="background:#f59e0b;color:#000">{{ order.статус }}</span>
+                    {% elif order.статус == 'Новый' %}<span class="badge" style="background:#3b82f6">{{ order.статус }}</span>
+                    {% else %}<span class="badge" style="background:#64748b">{{ order.статус }}</span>{% endif %}
+                </td></tr>
+                <tr><th>Итого</th><td><strong class="text-success">{{ "%.0f"|format(order.итого) }} ₽</strong></td></tr>
+                <tr><th>Оплачено</th><td>{{ "%.0f"|format(order.оплачено) }} ₽</td></tr>
+                <tr><th>Способ оплаты</th><td>{{ order.способ_оплаты or '—' }}</td></tr>
+                <tr><th>Создан</th><td>{{ order.дата_создания[:16] }}</td></tr>
+                <tr><th>Планируется</th><td>{{ order.планируемая_дата[:16] if order.планируемая_дата else '—' }}</td></tr>
+                <tr><th>Комментарий</th><td>{{ order.комментарий or '—' }}</td></tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 mb-4">
+    <h4>🛠️ Состав заказа</h4>
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead><tr><th>Услуга</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr></thead>
+            <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.название }}</td>
+                <td>{{ item.количество }}</td>
+                <td>{{ "%.0f"|format(item.цена_на_момент) }} ₽</td>
+                <td><strong>{{ "%.0f"|format(item.сумма) }} ₽</strong></td>
+                <td>
+                    <a href="{{ url_for('order_remove_item', item_id=item.id) }}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Удалить услугу из заказа?')">🗑️</a>
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not items %}
+            <tr><td colspan="5" class="text-center py-3">Услуги ещё не добавлены</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+    <h5>➕ Добавить услугу</h5>
+    <form method="post" action="{{ url_for('order_add_service', id=order.id) }}">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-6">
+                <label class="form-label">Услуга</label>
+                <select name="service_id" class="form-select" required>
+                    <option value="">Выберите услугу</option>
+                    {% for s in services %}
+                    <option value="{{ s.id }}">{{ s.название }} — {{ "%.0f"|format(s.цена) }} ₽</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Кол-во</label>
+                <input type="number" name="quantity" value="1" min="1" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">➕ Добавить</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

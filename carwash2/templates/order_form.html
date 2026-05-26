@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card p-4">
+            <h2>{{ title }}</h2>
+            <form method="post">
+                <div class="mb-3">
+                    <label class="form-label">Клиент *</label>
+                    <select name="клиент_id" id="clientSel" class="form-select" required>
+                        <option value="">Выберите клиента</option>
+                        {% for c in clients %}
+                        <option value="{{ c.id }}">{{ c.фио }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Автомобиль *</label>
+                    <select name="автомобиль_id" id="carSel" class="form-select" required>
+                        <option value="">Сначала выберите клиента</option>
+                        {% for v in vehicles %}
+                        <option value="{{ v.id }}" data-client="{{ v.клиент_id }}">
+                            {{ v.марка }} {{ v.модель }} ({{ v.госномер }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Статус</label>
+                    <select name="статус" class="form-select">
+                        <option>Новый</option>
+                        <option>В работе</option>
+                        <option>Запланировано</option>
+                        <option>Готов</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Планируемая дата и время</label>
+                    <input type="datetime-local" name="планируемая_дата" class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Способ оплаты</label>
+                    <select name="способ_оплаты" class="form-select">
+                        <option value="">Не указан</option>
+                        <option>Наличные</option>
+                        <option>Карта</option>
+                        <option>СБП</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Комментарий</label>
+                    <textarea name="комментарий" class="form-control" rows="2"
+                              placeholder="Пожелания, особые отметки..."></textarea>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-success">✅ Создать заказ</button>
+                    <a href="{{ url_for('orders') }}" class="btn btn-secondary">Отмена</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+const clientSel = document.getElementById('clientSel');
+const carSel    = document.getElementById('carSel');
+const allOpts   = Array.from(carSel.querySelectorAll('option[data-client]'));
+
+function filterCars() {
+    const cid = clientSel.value;
+    carSel.innerHTML = '<option value="">Выберите автомобиль</option>';
+    const filtered = cid ? allOpts.filter(o => o.dataset.client === cid) : allOpts;
+    if (filtered.length === 0 && cid) {
+        carSel.innerHTML += '<option value="" disabled>— у этого клиента нет авто —</option>';
+    }
+    filtered.forEach(o => carSel.appendChild(o.cloneNode(true)));
+}
+
+clientSel.addEventListener('change', filterCars);
+filterCars();
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Клиенты{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>👥 Клиенты</h2>
+    <a href="{{ url_for('client_new') }}" class="btn btn-primary">➕ Добавить клиента</a>
+</div>
+<div class="card p-0">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>ID</th><th>Телефон</th><th>ФИО</th><th>Скидка %</th><th>Действия</th></tr>
+            </thead>
+            <tbody>
+            {% for c in clients %}
+            <tr>
+                <td>{{ c.id }}</td>
+                <td>{{ c.телефон }}</td>
+                <td>{{ c.фио }}</td>
+                <td>
+                    {% if c.скидка_процент > 0 %}
+                    <span class="badge" style="background:#10b981">{{ c.скидка_процент }}%</span>
+                    {% else %}—{% endif %}
+                </td>
+                <td>
+                    <a href="{{ url_for('client_edit', id=c.id) }}" class="btn btn-sm btn-warning">✏️</a>
+                    {% if is_admin() %}
+                    <a href="{{ url_for('client_delete', id=c.id) }}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Удалить клиента {{ c.фио }}?')">🗑️</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            {% if not clients %}
+            <tr><td colspan="5" class="text-center py-4">Клиенты не найдены</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

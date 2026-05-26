@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoDetail Pro — {% block title %}{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="{% if is_client() %}{{ url_for('booking') }}{% else %}{{ url_for('index') }}{% endif %}">
+      <span class="brand-icon">🚗</span>
+      <span class="brand-text">AutoDetail Pro</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nb">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse justify-content-end" id="nb">
+      {% if cu_login %}
+      <ul class="navbar-nav align-items-center">
+
+        {# ── Клиент видит только «Мои записи» ── #}
+        {% if is_client() %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint=='booking' %}active{% endif %}"
+               href="{{ url_for('booking') }}">🗓️ Мои записи</a>
+          </li>
+
+        {# ── Оператор и Администратор ── #}
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint=='index' %}active{% endif %}"
+               href="{{ url_for('index') }}">🏠 Дашборд</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint in ('services','service_new','service_edit') %}active{% endif %}"
+               href="{{ url_for('services') }}">🛠️ Услуги</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint in ('clients','client_new','client_edit') %}active{% endif %}"
+               href="{{ url_for('clients') }}">👥 Клиенты</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint in ('vehicles','vehicle_new','vehicle_edit') %}active{% endif %}"
+               href="{{ url_for('vehicles') }}">🏎️ Авто</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint in ('orders','order_new','order_detail','order_edit') %}active{% endif %}"
+               href="{{ url_for('orders') }}">📋 Заказы</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint=='reports' %}active{% endif %}"
+               href="{{ url_for('reports') }}">📊 Отчёты</a>
+          </li>
+          {% if is_admin() %}
+          <li class="nav-item">
+            <a class="nav-link {% if request.endpoint=='admin_panel' %}active{% endif %}"
+               href="{{ url_for('admin_panel') }}">⚙️ Админ</a>
+          </li>
+          {% endif %}
+          <li class="nav-item ms-2">
+            <a href="{{ url_for('order_new') }}" class="btn btn-primary btn-sm nav-cta">➕ Новый заказ</a>
+          </li>
+        {% endif %}
+
+        {# ── Бейдж пользователя ── #}
+        <li class="nav-item ms-2">
+          <div class="user-badge">
+            <span class="user-role-badge
+              {% if cu_role=='admin' %}badge-admin
+              {% elif cu_role=='operator' %}badge-operator
+              {% else %}badge-client{% endif %}">
+              {% if cu_role=='admin' %}👑{% elif cu_role=='operator' %}🔧{% else %}🙋{% endif %}
+              {{ cu_name }}
+            </span>
+            <a href="{{ url_for('logout') }}" class="btn-logout">Выйти</a>
+          </div>
+        </li>
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+<div class="nav-spacer"></div>
+
+<main class="container mt-4 mb-5">
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% if msgs %}
+      {% for cat, msg in msgs %}
+        <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+          {% if cat=='success' %}✅{% elif cat=='danger' %}❌{% elif cat=='warning' %}⚠️{% else %}ℹ️{% endif %}
+          {{ msg }}
+          <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="footer py-3">
+  <div class="container text-center">
+    <p class="mb-0">© 2026 <span style="color:#f59e0b">AutoDetail Pro</span> — Система управления автомойкой</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

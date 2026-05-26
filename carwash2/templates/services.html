@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Услуги{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>🛠️ Услуги</h2>
+    {% if is_admin() %}
+    <a href="{{ url_for('service_new') }}" class="btn btn-primary">➕ Добавить услугу</a>
+    {% endif %}
+</div>
+<div class="card p-0">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>ID</th><th>Название</th><th>Цена, ₽</th><th>Категория</th><th>Время (мин)</th>
+                {% if is_admin() %}<th>Действия</th>{% endif %}</tr>
+            </thead>
+            <tbody>
+            {% for s in services %}
+            <tr>
+                <td>{{ s.id }}</td>
+                <td>{{ s.название }}</td>
+                <td><strong>{{ "%.0f"|format(s.цена) }}</strong></td>
+                <td><span class="badge" style="background:#1e3a5f;color:#7dd3fc">{{ s.категория or '—' }}</span></td>
+                <td>{{ s.время_мин }} мин</td>
+                {% if is_admin() %}
+                <td>
+                    <a href="{{ url_for('service_edit', id=s.id) }}" class="btn btn-sm btn-warning">✏️</a>
+                    <a href="{{ url_for('service_delete', id=s.id) }}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Удалить услугу «{{ s.название }}»?')">🗑️</a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+            {% if not services %}
+            <tr><td colspan="6" class="text-center py-4">Услуги не найдены</td></tr>
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

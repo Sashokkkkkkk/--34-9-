@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}Запись на мойку{% endblock %}
+{% block content %}
+
+<div class="text-center mb-5">
+  <h1 style="font-size:2.2rem;font-weight:900">🚗 Запись на мойку</h1>
+  <p style="color:var(--text-muted)">Привет, <strong style="color:var(--gold-primary)">{{ cu_name }}</strong>! Выберите услуги и заполните форму.</p>
+</div>
+
+{# ── Каталог услуг ── #}
+<div class="card p-4 mb-4">
+  <h4 class="mb-3">🛠️ Выберите услуги</h4>
+  <div class="row g-3" id="svcGrid">
+    {% for s in services %}
+    <div class="col-md-4 col-sm-6">
+      <div class="svc-card" onclick="toggleSvc(this, '{{ s.id }}', {{ s.цена }})">
+        <div class="svc-cat-badge">{{ s.категория or 'услуга' }}</div>
+        <div style="font-weight:700;font-size:1rem;margin-bottom:4px">{{ s.название }}</div>
+        <div style="color:var(--text-muted);font-size:.83rem;margin-bottom:10px;min-height:36px">
+          {{ s.описание or '' }}
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="svc-price">{{ "%.0f"|format(s.цена) }} ₽</span>
+          <span style="color:var(--text-muted);font-size:.8rem">⏱ {{ s.время_мин }} мин</span>
+        </div>
+        <input type="hidden" class="svc-id" value="{{ s.id }}">
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="mt-3 d-flex align-items-center gap-3">
+    <span style="color:var(--text-muted)">Итого:</span>
+    <span class="booking-total" id="totalLabel">0 ₽</span>
+    <span id="selectedInfo" style="color:var(--text-muted);font-size:.85rem"></span>
+  </div>
+</div>
+
+{# ── Форма бронирования ── #}
+<div class="card p-4 mb-5">
+  <h4 class="mb-3">📋 Данные для записи</h4>
+  <form method="post" action="{{ url_for('booking_request') }}" id="bookForm">
+    <input type="hidden" name="services" id="svcHidden" value="">
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Ваше имя *</label>
+        <input type="text" name="name" class="form-control"
+               value="{{ my_client.фио if my_client else cu_name }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Телефон *</label>
+        <input type="text" name="phone" class="form-control"
+               value="{{ my_client.телефон if my_client else '' }}"
+               placeholder="+79001234567" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Марка и модель авто *</label>
+        <input type="text" name="car" class="form-control" placeholder="Toyota Camry" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Государственный номер *</label>
+        <input type="text" name="госномер" class="form-control" placeholder="А123ВС 777" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Желаемые дата и время</label>
+        <input type="datetime-local" name="план_дата" class="form-control">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Комментарий</label>
+        <input type="text" name="комментарий" class="form-control" placeholder="Пожелания...">
+      </div>
+    </div>
+
+    <div class="mt-4 d-flex gap-3 align-items-center">
+      <button type="submit" class="btn btn-primary btn-lg px-5 fw-bold" id="submitBtn" disabled>
+        📅 Забронировать
+      </button>
+      <span id="submitHint" style="color:#f59e0b;font-size:.9rem">← Выберите хотя бы одну услугу</span>
+    </div>
+  </form>
+</div>
+
+{# ── История заказов ── #}
+{% if my_orders %}
+<div class="card p-4">
+  <h4 class="mb-3">🕐 Мои заказы</h4>
+  <div class="table-responsive">
+    <table class="table table-striped mb-0">
+      <thead><tr><th>№</th><th>Авто</th><th>Статус</th><th>Сумма</th><th>Дата записи</th><th>Желаемое время</th><th>Комментарий</th></tr></thead>
+      <tbody>
+      {% for o in my_orders %}
+      <tr>
+        <td>#{{ o.id }}</td>
+        <td>{{ o.авто }} <small style="color:var(--text-muted)">{{ o.госномер }}</small></td>
+        <td>
+          {% set sc = {'Новый':'order-status-new','В работе':'order-status-work','Готов':'order-status-done'}.get(o.статус,'order-status-plan') %}
+          <span class="badge {{ sc }}">{{ o.статус }}</span>
+        </td>
+        <td>{{ "%.0f"|format(o.итого) }} ₽</td>
+        <td>{{ o.дата_создания[:16] }}</td>
+        <td>{{ o.планируемая_дата[:16] if o.планируемая_дата else '—' }}</td>
+        <td>{{ o.комментарий or '—' }}</td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="text-center py-4" style="color:var(--text-muted)">
+  <p>У вас пока нет заказов. Выберите услуги и запишитесь! 👆</p>
+</div>
+{% endif %}
+
+<script>
+const selected = new Map();
+function toggleSvc(el, id, price) {
+  if (selected.has(id)) { selected.delete(id); el.classList.remove('selected'); }
+  else { selected.set(id, price); el.classList.add('selected'); }
+  const total = [...selected.values()].reduce((a,b)=>a+b, 0);
+  document.getElementById('totalLabel').textContent = total.toLocaleString('ru') + ' ₽';
+  const n = selected.size;
+  document.getElementById('selectedInfo').textContent = n ? `(выбрано ${n} услуг${n===1?'а':n<5?'и':''})`:'';
+  // Build hidden input (multiple values via comma, split server-side via getlist)
+  const form = document.getElementById('bookForm');
+  form.querySelectorAll('input[name="services"]').forEach(i=>i.remove());
+  for (const [sid] of selected) {
+    const inp = document.createElement('input');
+    inp.type='hidden'; inp.name='services'; inp.value=sid;
+    form.appendChild(inp);
+  }
+  document.getElementById('submitBtn').disabled = selected.size === 0;
+  document.getElementById('submitHint').style.display = selected.size ? 'none' : 'inline';
+}
+</script>
+{% endblock %}

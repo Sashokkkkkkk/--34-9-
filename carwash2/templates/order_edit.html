@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Редактировать заказ №{{ order.id }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <div class="card p-4">
+      <h2>✏️ Заказ №{{ order.id }}</h2>
+      <form method="post">
+        <div class="mb-3">
+          <label class="form-label">Статус</label>
+          <select name="статус" class="form-select">
+            {% for s in ['Новый','В работе','Запланировано','Готов'] %}
+            <option {% if order.статус==s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% if is_admin() %}
+        <div class="mb-3">
+          <label class="form-label">Оплачено (₽)</label>
+          <input type="number" step="0.01" min="0" name="оплачено" class="form-control"
+                 value="{{ "%.2f"|format(order.оплачено) }}">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Способ оплаты</label>
+          <select name="способ_оплаты" class="form-select">
+            <option value="" {% if not order.способ_оплаты %}selected{% endif %}>Не указан</option>
+            {% for m in ['Наличные','Карта','СБП'] %}
+            <option {% if order.способ_оплаты==m %}selected{% endif %}>{{ m }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% endif %}
+        <div class="mb-3">
+          <label class="form-label">Планируемая дата</label>
+          <input type="datetime-local" name="планируемая_дата" class="form-control"
+                 value="{{ order.планируемая_дата[:16] if order.планируемая_дата else '' }}">
+        </div>
+        <div class="mb-4">
+          <label class="form-label">Комментарий</label>
+          <textarea name="комментарий" class="form-control" rows="2">{{ order.комментарий or '' }}</textarea>
+        </div>
+        {% if not is_admin() %}
+        <div class="alert alert-info" style="font-size:.85rem">
+          ℹ️ Оплату и способ оплаты может изменить только администратор.
+        </div>
+        {% endif %}
+        <div class="d-flex gap-2">
+          <button type="submit" class="btn btn-success">💾 Сохранить</button>
+          <a href="{{ url_for('order_detail', id=order.id) }}" class="btn btn-secondary">Отмена</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
