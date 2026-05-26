@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📈 Аналитические отчёты</h2>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3>1. Клиент с наибольшей суммой заказов</h3>
+        {% if top_client %}
+        <div class="report-section">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 250px;">Клиент</th>
+                        <td>{{ top_client['Клиент'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>Телефон</th>
+                        <td>{{ top_client['Телефон'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>Количество заказов</th>
+                        <td>{{ top_client['Заказов'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>Итого (₽)</th>
+                        <td><strong style="color: #4ade80;">{{ top_client['Итого_руб'] }} ₽</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <span>ℹ️ Нет данных о клиентах с заказами</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-12">
+        <h3>2. Все мойки за сегодня ({{ today_date }})</h3>
+        {% if today_washes %}
+        <div class="report-section">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>№ заказа</th>
+                        <th>Клиент</th>
+                        <th>Авто</th>
+                        <th>Госномер</th>
+                        <th>Услуга</th>
+                        <th>Цена</th>
+                        <th>Статус</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for w in today_washes %}
+                    <tr>
+                        <td>{{ w['№_заказа'] }}</td>
+                        <td>{{ w['Клиент'] }}</td>
+                        <td>{{ w['Авто'] }}</td>
+                        <td>{{ w['Госномер'] }}</td>
+                        <td>{{ w['Услуга'] }}</td>
+                        <td>{{ w['Цена'] }} ₽</td>
+                        <td>
+                            {% if w['Статус'] == 'Готов' %}
+                            <span class="badge" style="background: #10b981; color: white;">{{ w['Статус'] }}</span>
+                            {% elif w['Статус'] == 'В работе' %}
+                            <span class="badge" style="background: #f59e0b; color: #0f172a;">{{ w['Статус'] }}</span>
+                            {% elif w['Статус'] == 'Новый' %}
+                            <span class="badge" style="background: #3b82f6; color: white;">{{ w['Статус'] }}</span>
+                            {% else %}
+                            <span class="badge" style="background: #64748b; color: white;">{{ w['Статус'] }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background: rgba(245, 158, 11, 0.1);">
+                        <td colspan="5" style="text-align: right; font-weight: 700;">Итого за день:</td>
+                        <td colspan="2" style="font-weight: 700; color: #4ade80; font-size: 1.1rem;">{{ total_today }} ₽</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <span>ℹ️ За сегодня моек не было</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row mt-4 mb-5">
+    <div class="col-12">
+        <h3>3. Автомобиль, реже всего мытый в этом году</h3>
+        {% if least_washed %}
+        <div class="report-section">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <th style="width: 250px;">Автомобиль</th>
+                        <td>{{ least_washed['Авто'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>Госномер</th>
+                        <td>{{ least_washed['Госномер'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>Владелец</th>
+                        <td>{{ least_washed['Владелец'] }}</td>
+                    </tr>
+                    <tr>
+                        <th>Моек в этом году</th>
+                        <td>
+                            {% if least_washed['Моек_в_году'] == 0 %}
+                            <strong style="color: #ef4444;">{{ least_washed['Моек_в_году'] }}</strong>
+                            {% else %}
+                            <strong style="color: #fbbf24;">{{ least_washed['Моек_в_году'] }}</strong>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info">
+            <span>ℹ️ Нет данных об автомобилях</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

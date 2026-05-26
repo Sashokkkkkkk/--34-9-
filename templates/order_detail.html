@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Заказ №{{ order.id }}</h2>
+<p><strong>Клиент:</strong> {{ order.клиент_фио }}<br>
+<strong>Авто:</strong> {{ order.марка }} {{ order.модель }} ({{ order.госномер }})<br>
+<strong>Статус:</strong> {{ order.статус }}<br>
+<strong>Итого:</strong> {{ order.итого }} ₽, Оплачено: {{ order.оплачено }} ₽<br>
+<strong>Способ оплаты:</strong> {{ order.способ_оплаты or 'не указан' }}<br>
+<strong>Планируемая дата:</strong> {{ order.планируемая_дата or 'не указана' }}<br>
+<strong>Комментарий:</strong> {{ order.комментарий or '' }}</p>
+<a href="{{ url_for('order_edit', id=order.id) }}" class="btn btn-secondary">✏️ Редактировать заказ</a>
+<a href="{{ url_for('order_delete', id=order.id) }}" class="btn btn-danger" onclick="return confirm('Удалить заказ?')">🗑️ Удалить</a>
+<hr>
+<h4>Состав заказа</h4>
+<table class="table">
+    <thead><tr><th>Услуга</th><th>Кол-во</th><th>Цена</th><th>Сумма</th><th></th></tr></thead>
+    <tbody>
+    {% for item in items %}
+    <tr><td>{{ item.название }}</td><td>{{ item.количество }}</td><td>{{ item.цена_на_момент }}</td>
+        <td>{{ item.сумма }}</td>
+        <td><a href="{{ url_for('order_remove_item', item_id=item.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Удалить услугу?')">❌</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<h5>Добавить услугу</h5>
+<form method="post" action="{{ url_for('order_add_service', id=order.id) }}">
+    <div class="row">
+        <div class="col"><select name="service_id" class="form-select" required>
+            <option value="">Выберите услугу</option>
+            {% for s in services %}<option value="{{ s.id }}">{{ s.название }} ({{ s.цена }} ₽)</option>{% endfor %}
+        </select></div>
+        <div class="col"><input type="number" name="quantity" value="1" min="1" class="form-control" required></div>
+        <div class="col"><button type="submit" class="btn btn-primary">➕ Добавить</button></div>
+    </div>
+</form>
+{% endblock %}

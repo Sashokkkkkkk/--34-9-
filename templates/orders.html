@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="d-flex justify-content-between">
+    <h2>Заказы</h2>
+    <a href="{{ url_for('order_new') }}" class="btn btn-primary">➕ Новый заказ</a>
+</div>
+<table class="table table-striped mt-3">
+    <thead><tr><th>№</th><th>Клиент</th><th>Авто</th><th>Статус</th><th>Сумма ₽</th><th>Оплачено</th><th>Способ оплаты</th><th>Действия</th></tr></thead>
+    <tbody>
+    {% for o in orders %}
+    <tr>
+        <td>{{ o.id }}</td><td>{{ o.фио }}</td><td>{{ o.авто }}</td>
+        <td>{{ o.статус }}</td><td>{{ o.итого }}</td><td>{{ o.оплачено }}</td><td>{{ o.способ_оплаты or '' }}</td>
+        <td>
+            <a href="{{ url_for('order_detail', id=o.id) }}" class="btn btn-sm btn-info">🔍</a>
+            <a href="{{ url_for('order_edit', id=o.id) }}" class="btn btn-sm btn-warning">✏️</a>
+            <a href="{{ url_for('order_delete', id=o.id) }}" class="btn btn-sm btn-danger" onclick="return confirm('Удалить заказ?')">❌</a>
+         </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

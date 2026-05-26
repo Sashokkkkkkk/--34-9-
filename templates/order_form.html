@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ title }}</h2>
+<form method="post">
+    <div class="mb-3"><label>Клиент</label><select name="клиент_id" id="clientSelect" class="form-select" required>
+        <option value="">Выберите клиента</option>
+        {% for c in clients %}
+        <option value="{{ c.id }}">{{ c.фио }}</option>
+        {% endfor %}
+    </select></div>
+    <div class="mb-3"><label>Автомобиль</label><select name="автомобиль_id" class="form-select" required>
+        <option value="">Выберите автомобиль</option>
+        {% for v in vehicles %}
+        <option value="{{ v.id }}">{{ v.марка }} {{ v.модель }} ({{ v.госномер }}) - {{ v.фио }}</option>
+        {% endfor %}
+    </select></div>
+    <div class="mb-3"><label>Статус</label><select name="статус" class="form-select">
+        <option>Новый</option><option>В работе</option><option>Запланировано</option><option>Готов</option>
+    </select></div>
+    <div class="mb-3"><label>Планируемая дата</label><input type="datetime-local" name="планируемая_дата" class="form-control"></div>
+    <div class="mb-3"><label>Способ оплаты</label><input type="text" name="способ_оплаты" class="form-control" placeholder="Наличные, Карта, СБП"></div>
+    <div class="mb-3"><label>Комментарий</label><textarea name="комментарий" class="form-control"></textarea></div>
+    <button type="submit" class="btn btn-success">Создать заказ</button>
+    <a href="{{ url_for('orders') }}" class="btn btn-secondary">Отмена</a>
+</form>
+<script>
+    // Простая фильтрация авто по клиенту (опционально)
+    const clientSelect = document.getElementById('clientSelect');
+    const carSelect = document.querySelector('select[name="автомобиль_id"]');
+    const allCars = Array.from(carSelect.options);
+    clientSelect.addEventListener('change', function() {
+        const clientId = this.value;
+        carSelect.innerHTML = '<option value="">Выберите автомобиль</option>';
+        for (let opt of allCars) {
+            if (opt.value === "") continue;
+            if (clientId === "" || opt.text.includes(`- ${clientSelect.options[clientSelect.selectedIndex].text}`)) {
+                carSelect.appendChild(opt.cloneNode(true));
+            }
+        }
+    });
+</script>
+{% endblock %}

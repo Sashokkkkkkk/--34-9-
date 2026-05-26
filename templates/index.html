@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="text-center mb-5" style="color: #ffffff;">📊 Панель управления</h1>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <h5 class="card-title">🆕 Новые заказы</h5>
+                <p class="card-text display-4 fw-bold">{{ new_orders }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <h5 class="card-title">⚙️ В работе</h5>
+                <p class="card-text display-4 fw-bold">{{ inwork_orders }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <h5 class="card-title">✅ Готово</h5>
+                <p class="card-text display-4 fw-bold">{{ ready_orders }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center p-3 h-100">
+            <div class="card-body d-flex flex-column justify-content-center">
+                <h5 class="card-title">👥 Клиентов</h5>
+                <p class="card-text display-4 fw-bold">{{ clients_cnt }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 mt-2">
+    <div class="card-body text-center">
+        <h5 class="card-title">💰 Общая выручка</h5>
+        <p class="display-3 fw-bold text-success">{{ revenue|round(2) }} ₽</p>
+    </div>
+</div>
+
+<!-- Заполнитель, чтобы не было пустоты внизу -->
+<div class="mt-5 pt-4 text-center" style="color: #94a3b8; font-size: 0.9rem;">
+    <i class="bi bi-droplet"></i> Актуальные показатели системы автомойки
+</div>
+{% endblock %}

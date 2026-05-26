@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ title }}</h2>
+<form method="post">
+    <div class="mb-3"><label>Владелец</label><select name="клиент_id" class="form-select" required>
+        <option value="">Выберите клиента</option>
+        {% for c in clients %}
+        <option value="{{ c.id }}" {% if vehicle and vehicle.клиент_id == c.id %}selected{% endif %}>{{ c.фио }}</option>
+        {% endfor %}
+    </select></div>
+    <div class="mb-3"><label>Марка</label><input type="text" name="марка" class="form-control" value="{{ vehicle.марка if vehicle else '' }}" required></div>
+    <div class="mb-3"><label>Модель</label><input type="text" name="модель" class="form-control" value="{{ vehicle.модель if vehicle else '' }}"></div>
+    <div class="mb-3"><label>Госномер</label><input type="text" name="госномер" class="form-control" value="{{ vehicle.госномер if vehicle else '' }}" required></div>
+    <div class="mb-3"><label>Цвет</label><input type="text" name="цвет" class="form-control" value="{{ vehicle.цвет if vehicle else '' }}"></div>
+    <button type="submit" class="btn btn-success">Сохранить</button>
+    <a href="{{ url_for('vehicles') }}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}

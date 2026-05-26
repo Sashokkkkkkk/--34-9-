@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Автомойка - Сопровождение ИС</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Пользовательские стили (премиальная тёмная тема) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Шрифт Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Навигация -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid px-4">
+        <!-- Название сайта слева -->
+        <a class="navbar-brand" href="{{ url_for('index') }}">
+            <span class="brand-icon">🚗</span>
+            <span class="brand-text">AutoDetail Pro</span>
+        </a>
+        
+        <!-- Кнопка гамбургера для мобильных -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Навигация справа -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'services' %}active{% endif %}" href="{{ url_for('services') }}">
+                        <span class="nav-icon">🛠️</span>
+                        Услуги
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'clients' %}active{% endif %}" href="{{ url_for('clients') }}">
+                        <span class="nav-icon">👥</span>
+                        Клиенты
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'vehicles' %}active{% endif %}" href="{{ url_for('vehicles') }}">
+                        <span class="nav-icon">🏎️</span>
+                        Автомобили
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'orders' %}active{% endif %}" href="{{ url_for('orders') }}">
+                        <span class="nav-icon">📋</span>
+                        Заказы
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" href="{{ url_for('reports') }}">
+                        <span class="nav-icon">📊</span>
+                        Отчёты
+                    </a>
+                </li>
+                <li class="nav-item ms-2">
+                    <a href="{{ url_for('order_new') }}" class="btn btn-primary btn-sm nav-cta">
+                        ➕ Новый заказ
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Отступ для фиксированной навигации -->
+<div class="nav-spacer"></div>
+
+<!-- Основной контейнер -->
+<main class="container mt-4 mb-5">
+    <!-- Flash-сообщения -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show d-flex align-items-center" role="alert">
+                    <span class="alert-icon me-2">
+                        {% if category == 'success' %}✅{% elif category == 'danger' %}❌{% else %}ℹ️{% endif %}
+                    </span>
+                    <span>{{ message }}</span>
+                    <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</main>
+
+<!-- Футер -->
+<footer class="footer mt-auto py-3">
+    <div class="container text-center">
+        <p class="mb-0">
+            © 2026 <span style="color: #f59e0b;">AutoDetail Pro</span> — Система управления автомойкой
+        </p>
+    </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

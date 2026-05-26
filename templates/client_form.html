@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ title }}</h2>
+<form method="post">
+    <div class="mb-3"><label>Телефон</label><input type="text" name="телефон" class="form-control" value="{{ client.телефон if client else '' }}" required></div>
+    <div class="mb-3"><label>ФИО</label><input type="text" name="фио" class="form-control" value="{{ client.фио if client else '' }}" required></div>
+    <div class="mb-3"><label>Скидка (%)</label><input type="number" name="скидка_процент" class="form-control" value="{{ client.скидка_процент if client else 0 }}"></div>
+    <button type="submit" class="btn btn-success">Сохранить</button>
+    <a href="{{ url_for('clients') }}" class="btn btn-secondary">Отмена</a>
+</form>
+{% endblock %}
